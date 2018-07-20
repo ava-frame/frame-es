@@ -44,13 +44,6 @@ public class EsClient implements InitializingBean {
         }
     }
 
-    public void createEmptyIndex() {
-        createEmptyIndex(esConfig.getIndex());
-    }
-
-    public void createEmptyIndex(String index) {
-        client.admin().indices().prepareCreate(index).execute().actionGet();  //创建一个空索引，如没有索引，创建mapping时会报错
-    }
 
     public void mapping() {
         mapping(esConfig.getIndex(), esConfig.getType());
@@ -100,14 +93,7 @@ public class EsClient implements InitializingBean {
             e.printStackTrace();
         }
     }
-    public String createIndex(String id, Map<String, Object> source) {
-        return createIndex(esConfig.getIndex(), esConfig.getType(), id, source);
-    }
 
-    public String createIndex(String index, String type, String id, Map<String, Object> source) {
-        IndexResponse response = client.prepareIndex(index, type).setSource(source).get();
-        return response.getIndex();
-    }
 
     public TransportClient getClient() {
         return client;

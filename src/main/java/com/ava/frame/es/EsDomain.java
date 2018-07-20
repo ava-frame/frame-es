@@ -10,11 +10,19 @@ public class EsDomain {
     private String id;
     private float score;
     private Map<String,Object> source;
-
+    private Map<String,String> highlights;
     public EsDomain(String id, float score, Map<String, Object> source) {
         this.id = id;
         this.score = score;
         this.source = source;
+    }
+
+    public Map<String, String> getHighlights() {
+        return highlights;
+    }
+
+    public void setHighlights(Map<String, String> highlights) {
+        this.highlights = highlights;
     }
 
     public String getId() {
