@@ -108,12 +108,26 @@ public class EsQuery {
         return new EsQuery(type);
     }
 
+    /**
+     * 精确查询
+     * @param field
+     * @param value
+     * @param link
+     * @return
+     */
     public EsQuery term(String field, String value, Link link) {
         if (link == Link.SHOULD) query.should(new TermQueryBuilder(field, value));
         if (link == Link.MUST) query.must(new TermQueryBuilder(field, value));
         return this;
     }
 
+    /**
+     * 分词查询
+     * @param field
+     * @param value
+     * @param link
+     * @return
+     */
     public EsQuery query(String field, String value, Link link) {
         if (link == Link.SHOULD) query.should(new QueryStringQueryBuilder(value).field(field));
         if (link == Link.MUST) query.must(new QueryStringQueryBuilder(value).field(field));
