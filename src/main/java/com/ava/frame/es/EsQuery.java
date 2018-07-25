@@ -1,6 +1,7 @@
 package com.ava.frame.es;
 
 import com.ava.frame.core.SpringApplicationContext;
+import org.apache.lucene.search.BooleanQuery;
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.DocWriteResponse;
@@ -108,29 +109,51 @@ public class EsQuery {
         return new EsQuery(type);
     }
 
-    /**
+      /**
      * 精确查询
+     *
      * @param field
      * @param value
-     * @param link
      * @return
      */
-    public EsQuery term(String field, String value, Link link) {
-        if (link == Link.SHOULD) query.should(new TermQueryBuilder(field, value));
-        if (link == Link.MUST) query.must(new TermQueryBuilder(field, value));
+    public EsQuery termMust(String field, String value) {
+        query.must(new TermQueryBuilder(field, value));
+        return this;
+    }
+    /**
+     * 分词查询
+     *
+     * @param field
+     * @param value
+     * @return
+     */
+    public EsQuery queryMust(String field, String value) {
+        query.must(new QueryStringQueryBuilder(value).field(field));
         return this;
     }
 
     /**
-     * 分词查询
+     * 精确查询
+     *
      * @param field
-     * @param value
-     * @param link
+     * @param values
      * @return
      */
-    public EsQuery query(String field, String value, Link link) {
-        if (link == Link.SHOULD) query.should(new QueryStringQueryBuilder(value).field(field));
-        if (link == Link.MUST) query.must(new QueryStringQueryBuilder(value).field(field));
+    public EsQuery termShould(String field, String... values) {
+        for (String value:values){
+            query.should(new TermQueryBuilder(field, value));
+        }
+        return this;
+    }
+    /**
+     * 分词查询
+     *
+     * @param field
+     * @param value
+     * @return
+     */
+    public EsQuery queryShould(String field, String value) {
+        query.should(new QueryStringQueryBuilder(value).field(field));
         return this;
     }
 
@@ -176,6 +199,7 @@ public class EsQuery {
 
     /**
      * index 存在
+     *
      * @return
      */
     public boolean hasIndex() {
@@ -229,7 +253,7 @@ public class EsQuery {
     public List<EsDomain> list() {
         try {
             SearchResponse response = client.prepareSearch(index).setTypes(type)
-                    .setQuery(query).setFrom(0).setSize(limit)
+                    .setPostFilter(query).setFrom(0).setSize(limit)
                     .execute().get();
             SearchHits hits = response.getHits();
             List<EsDomain> list = new ArrayList<EsDomain>();
@@ -276,7 +300,4 @@ public class EsQuery {
         }
     }
 
-    public enum Link {
-        MUST, SHOULD
-    }
 }
